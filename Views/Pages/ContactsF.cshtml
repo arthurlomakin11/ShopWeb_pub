@@ -1,0 +1,97 @@
+﻿@{ 
+    ViewBag.Title = "Контакти";
+
+    string FeedbackString = "Зворотний звязок";
+}
+
+<div class="contacts_main" style="display: flex; flex-wrap: wrap;">
+    <style>
+        i {
+            font-size: 50px;
+            display: block !important;
+            color: #ff4141;
+        }
+
+
+        @@media only screen and (max-width: 600px){
+            .contacts_main > div {
+                width: 100% !important;
+            }
+        }
+
+        .grid_cont div {
+            text-align: center;
+            margin: 10px 0;
+        }
+
+        .grid_cont span {
+            font-size: 1rem;
+        }
+
+        .new_line {
+            display: block;
+        }
+
+        .grid_cont {
+            display: grid;
+            grid-gap: 10px;
+        }
+
+        .form-control {
+            background: #0000 !important;
+            color: #fff !important;
+            border: #fff 1px solid;
+        }
+
+        .form-control::-webkit-input-placeholder {
+            color: #c9c9c9 !important;
+        }
+    </style>
+    <div style="width: 50%; padding: 0 15px;">      
+        <div class="grid_cont">
+            <div>
+                <i class="fas fa-phone-alt"></i>
+                <span>м. КИЇВ Бортничі</span>
+                <span>вул. Євгенія Харченка 39 (за АТБ)</span>
+                <a class="new_line" href="tel:+380933175998">
+                    <span style="color:red;">+38 093 317 59 98</span>
+                </a>
+            </div>
+            <div>
+                <i class="far fa-clock"></i>
+                <span>ГОДИНИ РОБОТИ</span>
+                <span class="new_line" style="color:red;">Пн-Вс: 9:00 - 20:00</span>
+            </div>
+            <div>
+                <i class="far fa-envelope"></i>
+                <span>Email</span>
+                <a class="new_line" href="mailto:familycraft.kiev@gmail.com">
+                    <span style="color:red;">familycraft.kiev@gmail.com</span>
+                </a>
+            </div>
+            <div>
+                <i class="fa fa-map-marker-alt"></i>
+                <a target="_blank" rel="noopener" href="https://goo.gl/maps/WG4R7k9idTJNNmg79">
+                    <span style="color:red;">Ми на карті</span>
+                </a>
+            </div>
+            <div>
+                <i class="fa fa-directions"></i>
+                <a target="_blank" rel="noopener" href="https://www.google.com/maps/dir//FAMILY+CRAFT+%D0%A1%D0%92%D0%86%D0%96%D0%95+%D0%9C'%D0%AF%D0%A1%D0%9E,+Yevheniia+Kharchenka+St,+39,+Kyiv,+02000/@@50.3858014,30.6918145,17z/data=!4m9!4m8!1m0!1m5!1m1!1s0x40d4c5522edf12fb:0xb57e515dfe97a34b!2m2!1d30.6940032!2d50.3858014!3e0">
+                    <span style="color:red;">Прокласти шлях</span>
+                </a>
+            </div>
+            <div>
+                <a href="https://www.facebook.com/familycraft.kiev" target="_blank" rel="noopener">
+                    <i class="fab fa-facebook-square"></i>
+                </a>
+                <a style="margin: 20px 0;display: inline-block;" href="https://www.instagram.com/familycraft.kiev/" target="_blank" rel="noopener">
+                    <i class="fab fa-instagram"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <div style="width: 50%;">
+        <component type="typeof(Feedback)" param-TextAreaRows="15" render-mode="ServerPrerendered" param-FeedbackHeader="FeedbackString" />
+    </div>
+</div>

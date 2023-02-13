@@ -1,0 +1,5 @@
+﻿@{
+	ViewBag.Title = ViewBag.CurrentProduct.Name;
+}
+<link rel="stylesheet" href="./css/product_page.css" />
+<component type="typeof(ProductPage)" render-mode="Server" param-CurrentProduct="ViewBag.CurrentProduct"/>

@@ -1,0 +1,32 @@
+﻿@{
+    ShopWebContext Context = new();
+    List<MenuItem> Menu = Context.Menu.Where(i => i.Type == MenuType.MenuItem)
+                                    .Include(i => i.Parent)
+                                    .ToList();
+}
+
+<div class="admin_menubar">
+    @foreach(MenuItem MenuItem in Menu)
+    {
+        <div class="admin_menu_item">
+            <div class="admin_menu_item_name">
+                <a class="btn btn-sm btn-primary ml-2" asp-action="Edit" asp-route-MenuItemId="@MenuItem.Id">
+                    @MenuItem.Name
+                </a>
+            </div>
+            @{
+                IEnumerable<MenuItem> Children = Menu.Where(i => i.Parent?.Id == MenuItem.Id);
+            }
+            @foreach(MenuItem Child in Children)
+            {
+                <div class="admin_menu_item">
+                    <div class="admin_menu_item_name">
+                        <a class="btn btn-sm btn-primary ml-2" asp-action="Edit" asp-route-MenuItemId="@Child.Id">
+                        @Child.Name
+                        </a>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>

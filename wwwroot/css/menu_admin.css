@@ -1,0 +1,15 @@
+﻿.no-border-table {
+    display: inline-block;
+}
+
+.no-border-table td {
+    border: 0 !important;
+}
+
+details > summary::-webkit-details-marker {
+    margin-bottom: 0.7rem;
+}
+
+.SubTable {
+    margin-left: 70px;
+}

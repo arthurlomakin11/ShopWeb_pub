@@ -1,0 +1,148 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject ShopWebContext Context
+@inject SignInManager<User> SignInManager
+@inject IStringLocalizer<SharedResource> Localizer
+
+<link rel="stylesheet" href="css/products.css" />
+
+@if (ShowSorting)
+{
+    <select @bind="SortValue" @bind:event="onchanged" class="products_sort_select form-control col-lg-3 mt-2">
+        <option value="Rating">@SettingsManager.GetValue("ProductsRatingSearchName")</option>
+        <option value="Alphabet">За алфавітом</option>
+        <option value="PriceAsc">Від дешевих до дорогих</option>
+        <option value="PriceDesc">Від дорогих до дешевих</option>
+    </select>
+}
+@text
+@if (ProductsSearchEnabled)
+{
+    <label class="mr-1">Пошук: </label>
+    <input class="products_search_input form-control col-lg-3 mt-2" @bind="SearchText" @bind:event="oninput" />
+}
+
+@if (!string.IsNullOrWhiteSpace(SearchText))
+{
+    List<Product> SearchList = ProductsSearchList();
+    @if(SearchList != null && SearchList.Count > 0)
+    {
+        <div class="products-search-text">Знайдено:</div>
+        @if (AddPaginationInProductsList)
+        {
+            var ProductsList = SearchList.Batch(PaginatedProductsOnPageCount).ToList();
+            IEnumerable<int> PagesList = Enumerable.Range(0, ProductsList.Count);
+            IEnumerable<int> ReducedPagesList = Enumerable.Range(ActivePage - 2, 5).Intersect(PagesList);
+            int MaxPageNumber = PagesList.Max();
+            <section class="cards">
+                @foreach (Product Product in ProductsList[ActivePage])
+                {
+                    <ProductComponent CurrentProduct="@Product" @key="@Product.Id" />
+                }
+            </section>
+            @if(PagesList.Count() > 1)
+            {
+                <div class="products__pagination">
+                    <nav aria-label="Сторінки продуктів">
+                        <ul class="pagination products__pagination__ul">
+                            @if (!ReducedPagesList.Contains(0))
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" aria-label="Previous" @onclick="() => ActivePage--">
+                                        <span aria-hidden="true">&laquo;</span>
+                                        <span class="sr-only">Previous</span>
+                                    </button>
+                                </li>
+                            }
+                            @foreach(int PageNumber in ReducedPagesList)
+                            {
+                                <li class="page-item @(ActivePage == PageNumber ? "active": "")">
+                                    <button class="page-link" @onclick="() => ActivePage = PageNumber">@(PageNumber + 1)</button>
+                                </li>
+                            }
+                            @if (!ReducedPagesList.Contains(MaxPageNumber))
+                            {
+                                <li class="page-item">
+                                    <button class="page-link" aria-label="Next" @onclick="() => ActivePage++">
+                                        <span aria-hidden="true">&raquo;</span>
+                                        <span class="sr-only">Next</span>
+                                    </button>
+                                </li>
+                            }                
+                        </ul>
+                    </nav>            
+                </div>
+            }
+        }
+        else
+        {
+            <section class="cards">
+                @foreach (Product Product in SearchList)
+                {
+                    <ProductComponent CurrentProduct="@Product" @key="@Product.Id" />
+                }
+            </section>
+        }
+    }
+    else
+    {
+        <div class="products-search-text">Нажаль, нічого не знайдено</div>
+    }
+}
+else
+{
+    @if(AddPaginationInProductsList)
+    {
+        var ProductsList = SortedProducts().Batch(PaginatedProductsOnPageCount).ToList();
+        IEnumerable<int> PagesList = Enumerable.Range(0, ProductsList.Count);
+        IEnumerable<int> ReducedPagesList = Enumerable.Range(ActivePage - 2, 5).Intersect(PagesList);
+        int MaxPageNumber = PagesList.Max();
+        <section class="cards">
+            @foreach (Product Product in ProductsList[ActivePage])
+            {
+                <ProductComponent CurrentProduct="@Product" @key="@Product.Id" />
+            }
+        </section>
+        @if(PagesList.Count() > 1)
+        {
+            <div class="products__pagination">
+                <nav aria-label="Сторінки продуктів">
+                    <ul class="pagination products__pagination__ul">
+                        @if (!ReducedPagesList.Contains(0))
+                        {
+                            <li class="page-item">
+                                <button class="page-link" aria-label="Previous" @onclick="GetToPreviousPage">
+                                    <span aria-hidden="true">&laquo;</span>
+                                    <span class="sr-only">Previous</span>
+                                </button>
+                            </li>
+                        }
+                        @foreach(int PageNumber in ReducedPagesList)
+                        {
+                            <li class="page-item @(ActivePage == PageNumber ? "active": "")">
+                                <button class="page-link" @onclick="() => GetToActivePage(PageNumber)">@(PageNumber + 1)</button>
+                            </li>
+                        }
+                        @if (!ReducedPagesList.Contains(MaxPageNumber))
+                        {
+                            <li class="page-item">
+                                <button class="page-link" aria-label="Next" @onclick="GetToNextActivePage">
+                                    <span aria-hidden="true">&raquo;</span>
+                                    <span class="sr-only">Next</span>
+                                </button>
+                            </li>
+                        }
+                    </ul>
+                </nav>            
+            </div>
+        }    
+    }
+    else
+    {
+        <section class="cards">
+            @foreach (Product Product in SortedProducts())
+            {
+                <ProductComponent CurrentProduct="@Product" @key="@Product.Id" />
+            }
+        </section>
+    }
+}

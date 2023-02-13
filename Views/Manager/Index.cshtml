@@ -1,0 +1,54 @@
+﻿@model IEnumerable<MenuItem>
+<link rel="stylesheet" href="css/menu_admin.css" />
+
+@{
+    ViewData["Title"] = "Меню";
+
+    ShopWebContext context = new ShopWebContext();
+    List<MenuItem> SubItems;
+}
+
+<div class="admin_container">
+    <partial name="MenuBar" />
+    <div class="admin_main">
+        <h2>Меню</h2>
+
+        @foreach (MenuItem item in Model)
+        {
+            {
+                SubItems = context.Menu.Where(menu => menu.Parent == item).ToList();
+            }
+            @if (SubItems.Count > 0)
+            {
+                <details class="mt-1">
+                    <summary>
+                        <table class="no-border-table">
+                            <tr>
+                                <td>@item.Name</td>
+                                <td>
+                                    <a class="btn btn-sm btn-primary ml-2" asp-action="Edit" asp-route-MenuItemId="@item.Id">Изменить</a>
+                                </td>
+                            </tr>
+                        </table>
+                    </summary>
+                    <div class="SubTable">
+                        @foreach (MenuItem SubItem in SubItems)
+                        {
+                            <div>
+                                @SubItem.Name
+                                <a class="btn btn-sm btn-primary ml-2" asp-action="Edit" asp-route-MenuItemId="@SubItem.Id">Изменить</a>
+                            </div>
+                        }
+                    </div>
+                </details>
+            }
+            else
+            {
+                <div class="mt-1">
+                    @item.Name
+                    <a class="btn btn-sm btn-primary ml-2" asp-action="Edit" asp-route-MenuItemId="@item.Id">Изменить</a>
+                </div>
+            }
+        }
+    </div>
+</div>

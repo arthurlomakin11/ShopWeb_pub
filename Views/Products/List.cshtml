@@ -1,0 +1,18 @@
+﻿@using ShopWeb.Components
+
+@{
+    ViewBag.Title = "Продукція";
+
+    int ShowBackLinkInProducts = int.Parse(SettingsManager.GetValue("ShowBackLinkInProducts"));
+}
+
+@Html.Raw(SettingsManager.GetValue("ProductsPageStartHTML"))
+@if (ShowBackLinkInProducts == 1)
+{
+    <a asp-controller="Products" asp-action="List"
+                           asp-route-category=""
+                           asp-route-subcategory=""
+                           class="btn btn-primary mt-2">Назад до категорій</a>
+}
+
+<component type="typeof(List)" render-mode="Server" param-Products="ViewBag.Products" />

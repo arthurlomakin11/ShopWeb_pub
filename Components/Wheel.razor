@@ -1,0 +1,28 @@
+﻿@inject IJSRuntime JS
+@inject Microsoft.AspNetCore.Hosting.IWebHostEnvironment _env
+@inject NavigationManager NavManager
+
+<link rel="stylesheet" href="wheel/wheel.css" />
+
+@if (!Done)
+{
+    <div class="wheel" align="center">
+        <canvas id="canvas" width="434" height="434" 
+            data-responsiveMinWidth="180"
+            data-responsiveScaleHeight="true"
+            data-responsiveMargin="50"></canvas>
+        <img id="spin_button" src="wheel/spin_on.png" alt="Spin" class="clickable" onclick="startSpin()" />
+    </div>
+}
+else
+{
+    <div class="wheel_greetings">
+        <div class="wheel_greetings_text"></div>
+        <button class="btn btn-outline-success wheel_greetings_button" @onclick="Redirect">Продовжити</button>
+    </div>
+}
+
+<script suppress-error="BL9992">
+    DotNet.invokeMethodAsync('ShopWeb', 'LoadedMethod');
+</script>
+@text

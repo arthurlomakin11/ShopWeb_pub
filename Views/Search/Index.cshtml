@@ -1,0 +1,13 @@
+﻿<div class="products_search">
+    @foreach (MenuItem Page in ViewBag.Pages)
+    {
+        <div asp>@Page.Name</div>
+    }
+</div>
+
+<div class="pages_search">
+    @foreach(Product Product in ViewBag.Products)
+    {
+        <div>@Product.Name</div>
+    }
+</div>

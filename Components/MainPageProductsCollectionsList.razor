@@ -1,0 +1,17 @@
+﻿@inject ILocalStorageService LocalStorage
+@inject SignInManager<User> SignInManager
+
+@if(ShowProductsCollectionsOnMainPage == 1)
+{    
+    @foreach (ProductCollection ProductCollection in ProductCollections)
+    {
+        <div class="main_product_collection_name">@ProductCollection.Name</div>
+        <div class="cards">
+            @foreach (ProductInCollection ProductInCollection in ProductCollection.Products)
+            {
+                Product Product = ProductInCollection.Product;
+                <ProductComponent CurrentProduct="@Product"/>
+            }                
+        </div>
+    }
+}

@@ -1,0 +1,87 @@
+﻿@{
+    List<Category> CategoryList = (ViewData["Categories"] as List<Category>)?.OrderByDescending(c => c.Rating)?.ToList();
+    string CurrentCategory = ViewData["Category"] as string;
+
+    string MenuStyle = SettingsManager.GetValue("MenuStyle");
+
+    bool ProductsMenuIsOpened = SettingsManager.GetValueBool("ProductsMenuIsOpened");
+}
+
+
+@if (CategoryList != null)
+{
+    <nav style="@MenuStyle" class="categories_nav navbar navbar-expand-md navbar-toggleable-sm bg-white border-bottom box-shadow">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse2" aria-controls="navbarSupportedContent"
+                aria-expanded="@(ProductsMenuIsOpened ? "true" : "false")" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="navbar-collapse2 collapse d-sm-inline-flex justify-content-between @(ProductsMenuIsOpened ? "show" : "")">
+            <ul class="navbar-nav flex-grow-1" style="justify-content: center">
+                <li class="nav-item">
+                    <a class="nav-link"
+                        asp-controller="Products"
+                        asp-action="List"
+                        asp-area=""
+                        asp-route-subcategory=""
+                        asp-route-category="">Всі продукти</a>
+                </li>
+                @foreach (Category Category in CategoryList.Where(c => c.Parent == null).Where(c => c.Active == true))
+                {
+                    <li class="nav-item">
+                        <a class="nav-link"
+                            asp-controller="Products"
+                            asp-action="List"
+                            asp-route-subcategory=""
+                            asp-route-category="@UrlExtensions.RemoveUnacceptableSymbols(Category.Name)">
+                            @if (Category.ShowText)
+                            {
+                                @Category.Name
+                            }
+                            @if (Category.Images.Count > 0)
+                            {
+                                <img style="height: 32px;" src="images/@Category.Images.First().Url" />
+                            }
+                        </a>
+                    </li>
+                }
+            </ul>
+        </div>
+    </nav>
+
+    IEnumerable<Category> sublist = CategoryList.Where(c => c.Parent?.Name.Replace(" ", "").Replace("'", "") == CurrentCategory).Where(c => c.Active == true);
+
+    @if (!string.IsNullOrWhiteSpace(CurrentCategory) && sublist.Count() > 0)
+    {
+        <nav style="@MenuStyle" class="navbar navbar-expand-sm navbar-toggleable-sm bg-white border-bottom box-shadow">
+            <div class="container">
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse3" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse3 collapse d-sm-inline-flex justify-content-between">
+                    <ul class="navbar-nav flex-grow-1">
+                        @foreach (Category SubCategory in sublist)
+                        {
+                            <li class="nav-item">
+                                <a class="nav-link"
+                                    asp-controller="Products"
+                                    asp-action="List"
+                                    asp-route-category="@CurrentCategory"
+                                    asp-route-subcategory="@UrlExtensions.RemoveUnacceptableSymbols(SubCategory.Name)">
+                                    @if (SubCategory.ShowText)
+                                    {
+                                        @SubCategory.Name
+                                    }
+                                    @if (SubCategory.Images.Count > 0)
+                                    {
+                                        <img style="height: 32px;" src="images/@SubCategory.Images.First().Url" />
+                                    }
+                                </a>
+                            </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    }
+}

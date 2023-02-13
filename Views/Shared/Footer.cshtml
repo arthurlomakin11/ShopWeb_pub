@@ -1,0 +1,378 @@
+﻿@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+@inject ILocalStorageService LocalStorage
+
+@{
+    int ShowFooter = int.Parse(SettingsManager.GetValue("ShowFooter"));
+
+    int ShowImagesInFooter = int.Parse(SettingsManager.GetValue("ShowImagesInFooter"));
+
+    string ImagesFolderLocalPath = SettingsManager.GetValue("ImagesFolderLocalPath");
+
+    int ShowMainPageInFooter = int.Parse(SettingsManager.GetValue("ShowMainPageInFooter"));
+    string MainPageIconPath = SettingsManager.GetValue("MainPageIconPath");
+    string MainPageActiveIconPath = SettingsManager.GetValue("MainPageActiveIconPath");
+
+    int ShowProductsPageInFooter = int.Parse(SettingsManager.GetValue("ShowProductsPageInFooter"));
+    string ProductsPageIconPath = SettingsManager.GetValue("ProductsPageIconPath");
+    string ProductsPageActiveIconPath = SettingsManager.GetValue("ProductsPageActiveIconPath");
+
+    int ShowAccountPageInFooter = int.Parse(SettingsManager.GetValue("ShowAccountPageInFooter"));
+    string AccountPageIconPath = SettingsManager.GetValue("AccountPageIconPath");
+    string AccountPageActiveIconPath = SettingsManager.GetValue("AccountPageActiveIconPath");
+
+
+    int ShowAccountInFooterInThreeDots = int.Parse(SettingsManager.GetValue("ShowAccountInFooterInThreeDots"));
+
+    int ShowBasketInFooter = int.Parse(SettingsManager.GetValue("ShowBasketInFooter"));
+    string BasketIconPath = SettingsManager.GetValue("BasketIconPath");
+    string BasketActiveIconPath = SettingsManager.GetValue("BasketActiveIconPath");
+
+    int ShowCartProductsCountIndicator = int.Parse(SettingsManager.GetValue("ShowCartProductsCountIndicator"));
+
+    int ShowLabelsInMobileMenuIcons = int.Parse(SettingsManager.GetValue("ShowLabelsInMobileMenuIcons"));
+
+    ShopWebContext context = new();
+    List<MenuItem> menu = (from element in context.Menu
+                           orderby element.SequentialNumber
+                           where element.Type == MenuType.MenuItem
+                           where element.MobileShowInMenu == true
+                           where element.Active == true
+                           where element.MobileParent == null
+                           select element)
+                        .Include(item => item.Images)
+                        .ToList();
+}
+
+@if (ShowFooter == 1)
+{
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            @if (int.Parse(SettingsManager.GetValue("ShowMenuInFooter")) == 1)
+            {
+                <ul class="col-sm">
+                    @if (ShowMainPageInFooter == 1)
+                    {
+                        <li class="footer-menu-link">
+                            <a asp-controller="Main" asp-action="Main"
+                               asp-route-MenuName="Головна"
+                               asp-route-SubMenuName=""
+                               class="footer-link">
+                                    @if (ShowImagesInFooter == 1)
+                                    {
+                                        @if ((ViewData["MenuItemName"] as string) == "Головна")
+                                        {
+                                            <img class="footer_img" alt="Головна" src="@MainPageActiveIconPath" />
+                                        }
+                                        else
+                                        {
+                                            <img class="footer_img" alt="Головна" src="@MainPageIconPath" />
+                                        }
+                                    }
+                                @if(ShowLabelsInMobileMenuIcons == 1)
+                                {
+                                    <span class="mobile-nav__icon__label">Головна</span>
+                                }
+                            </a>
+                        </li>
+                    }
+                    @if (ShowProductsPageInFooter == 1)
+                    {
+                        <li class="footer-menu-link">
+                            <a asp-controller="Main" asp-action="Main"
+                               asp-route-MenuName="Продукція"
+                               asp-route-SubMenuName=""
+                               asp-route-category=""
+                               asp-route-subcategory=""
+                               class="footer-link">
+                                    @if (ShowImagesInFooter == 1)
+                                    {
+                                        if ((ViewData["MenuItemName"] as string) == "Продукція")
+                                        {
+                                            <img class="footer_img" alt="Продукція" src="@ProductsPageActiveIconPath" />
+                                        }
+                                        else
+                                        {
+                                            <img class="footer_img" alt="Продукція" src="@ProductsPageIconPath" />
+                                        }
+                                    }
+                                    @if(ShowLabelsInMobileMenuIcons == 1)
+                                    {
+                                        <span class="mobile-nav__icon__label">Продукція</span>
+                                    }
+                            </a>
+                        </li>
+                    }
+                    @foreach (MenuItem element in menu.Where(el => el.AtTheEndOfTheMenu == false))
+                    {
+                        List<MenuItem> SubItems = context.Menu
+                            .Where(el => el.MobileParent == element)                            
+                            .Include(el => el.MobileParent)
+                            .ToList();
+                        <li class="footer-menu-link @(SubItems.Count > 0 ? "footer-link-has-sub-menu": "")">
+                            @if (string.IsNullOrWhiteSpace(element.Url))
+                            {
+                                <a asp-controller="Main" asp-action="Main"
+                                   asp-route-MenuName="@element.Name.Replace(" ", "")"
+                                   asp-route-SubMenuName=""
+                                   class="footer-link">
+                                        @if (ShowImagesInFooter == 1)
+                                        {
+                                            if (element.Id == (ViewData["MenuItem"] as MenuItem)?.Id && element.Images?.Count > 1)
+                                            {
+                                                <img class="footer_img" alt="@element.Name" src="@ImagesFolderLocalPath/@element.Images[1].Url" />
+                                            }
+                                            else if (element?.Images?.Count > 0)
+                                            {
+                                                <img class="footer_img" alt="@element.Name" src="@ImagesFolderLocalPath/@element.Images[0].Url" />
+                                            }
+                                        }
+                                        else
+                                        {
+                                            <span class="footer_text">
+                                                @element.Name
+                                            </span>
+                                        }
+                                        @if(ShowLabelsInMobileMenuIcons == 1)
+                                        {
+                                            <span class="mobile-nav__icon__label">@element.Name</span>
+                                        }
+                                </a>
+                            }
+                            else
+                            {
+                                <a href="@element.Url" class="footer-link">
+                                    @if (ShowImagesInFooter == 1)
+                                    {
+                                        if (element.Id == (ViewData["MenuItem"] as MenuItem)?.Id && element.Images?.Count > 1)
+                                        {
+                                            <img class="footer_img" alt="@element.Name" src="@ImagesFolderLocalPath/@element.Images[1].Url" />
+                                        }
+                                        else if (element?.Images?.Count > 0)
+                                        {
+                                            <img class="footer_img" alt="@element.Name" src="@ImagesFolderLocalPath/@element.Images[0].Url" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="footer_text">
+                                            @element.Name
+                                        </span>
+                                    }
+                                    @if(ShowLabelsInMobileMenuIcons == 1)
+                                    {
+                                        <span class="mobile-nav__icon__label">@element.Name</span>
+                                    }
+                                </a>
+                            }
+                            
+                            @if (SubItems.Count > 0)
+                            {
+                                <ul class="footer-sub-menu">
+                                    @foreach (MenuItem subitem in SubItems)
+                                    {
+                                        <li>
+                                            @if (!string.IsNullOrWhiteSpace(subitem.Url))
+                                            {
+                                                <a class="footer-link" href="@subitem.Url">@subitem.Name</a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Main" asp-action="Main"
+                                                   asp-route-MenuName="@subitem.Name.Replace(" ", "")"
+                                                   asp-route-SubMenuName=""
+                                                   class="footer-link">@subitem.Name</a>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }                    
+                    @if (ShowAccountPageInFooter == 1)
+                    {
+                        <li class="footer-menu-link footer-link-has-sub-menu">
+                            <a class="footer-link">
+                                @if ((ViewData["MenuItemName"] as string) == "Головна")
+                                {
+                                    <img class="footer_img" alt="@ViewData["MenuItemName"]" src="@AccountPageActiveIconPath" />
+                                }
+                                else
+                                {
+                                    <img class="footer_img" alt="@ViewData["MenuItemName"]" src="@AccountPageIconPath" />
+                                }
+                                @if(ShowLabelsInMobileMenuIcons == 1)
+                                {
+                                    <span class="mobile-nav__icon__label">Акаунт</span>
+                                }
+                            </a>
+                            <ul class="footer-sub-menu">
+                                @if (SignInManager.IsSignedIn(User))
+                                {
+                                    <li>
+                                        <a href="/Identity/Account/Manage" class="footer-link">
+                                            <img alt="Аккаунт" src="@ImagesFolderLocalPath/icons/account.svg" />
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                            <button type="submit" style="padding: 10px 0" class="nav-link btn btn-link text-dark">
+                                                <img alt="Вихід" src="@ImagesFolderLocalPath/icons/sign_out.svg" />
+                                            </button>
+                                        </form>
+                                    </li>
+                                }
+                                else
+                                {
+                                    <li>
+                                        <a href="/Identity/Account/Register" class="footer-link">
+                                            <img alt="Реєстрація" src="@ImagesFolderLocalPath/icons/register.svg" />
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a href="/Identity/Account/Login" class="footer-link">
+                                            <img alt="Вхід" src="@ImagesFolderLocalPath/icons/login.svg" />
+                                        </a>
+                                    </li>                                                               
+                                }
+                            </ul>
+                        </li>
+                    }
+                    @if(ShowBasketInFooter == 1)
+                    {
+                        <li class="footer-menu-link">
+                            <a class="footer-link" href="/Cart" style="position: relative">
+                                @if ((ViewData["MenuItemName"] as string) == "Cart")
+                                {
+                                    <img class="footer_img" alt="Корзина" src="@BasketActiveIconPath" />
+                                }
+                                else
+                                {
+                                    <img class="footer_img" alt="Корзина" src="@BasketIconPath" />
+                                }
+
+                                @if(ShowCartProductsCountIndicator == 1)
+                                {
+                                    int CartProductsCount = await new CartManager().CurrentCartProductsCount(SignInManager, LocalStorage);
+                                    
+                                    @if(CartProductsCount > 0)
+                                    {
+                                        <div class="basket_products_count_indicator">@CartProductsCount</div>   
+                                    }                                    
+                                }
+
+                                @if(ShowLabelsInMobileMenuIcons == 1)
+                                {
+                                    <span class="mobile-nav__icon__label">Корзина</span>
+                                }
+                            </a>
+                        </li>
+                    }
+                    @foreach (MenuItem element in menu.Where(el => el.AtTheEndOfTheMenu == true))
+                    {
+                        List<MenuItem> SubItems = context.Menu
+                            .Where(el => el.MobileParent == element)                            
+                            .Include(el => el.MobileParent)
+                            .ToList();                        
+                        <li class="footer-menu-link @(SubItems.Count > 0 ? "footer-link-has-sub-menu": "")">
+                            <a asp-controller="Main" asp-action="Main"
+                               asp-route-MenuName="@element.Name.Replace(" ", "")"
+                               asp-route-SubMenuName=""
+                               class="footer-link">
+                                    @if (ShowImagesInFooter == 1)
+                                    {
+                                        if (element.Id == (ViewData["MenuItem"] as MenuItem)?.Id && element.Images?.Count > 1)
+                                        {
+                                            <img class="footer_img" alt="@element.Name" src="@ImagesFolderLocalPath/@element.Images[1].Url" />
+                                        }
+                                        else if (element?.Images?.Count > 0)
+                                        {
+                                            <img class="footer_img" alt="@element.Name" src="@ImagesFolderLocalPath/@element.Images[0].Url" />
+                                        }
+                                    }
+                                    else
+                                    {
+                                        <span class="footer_text">
+                                            @element.Name
+                                        </span>
+                                    }
+                            </a>
+                            @if (SubItems.Count > 0)
+                            {
+                                <ul class="footer-sub-menu">
+                                    @if(ShowAccountInFooterInThreeDots == 1)
+                                    {
+                                        @if (SignInManager.IsSignedIn(User))
+                                            {
+                                                <li>
+                                                    <a href="/Identity/Account/Manage" class="footer-link">
+                                                        Аккаунт
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                                                        <button type="submit" style="padding: 10px 0" class="footer-link nav-link btn btn-link text-dark">
+                                                            Вихід
+                                                        </button>
+                                                    </form>
+                                                </li>
+                                            }
+                                            else
+                                            {
+                                                <li>
+                                                    <a href="/Identity/Account/Register" class="footer-link">
+                                                        Реєстрація
+                                                    </a>
+                                                </li>
+                                                <li>
+                                                    <a href="/Identity/Account/Login" class="footer-link">
+                                                        Вхід
+                                                    </a>
+                                                </li>                                                               
+                                            }
+                                    }
+                                    @foreach (MenuItem subitem in SubItems)
+                                    {
+                                        <li>
+                                            @if (!string.IsNullOrWhiteSpace(subitem.Url))
+                                            {
+                                                <a class="footer-link" href="@subitem.Url">@subitem.Name</a>
+                                            }
+                                            else
+                                            {
+                                                <a asp-controller="Main" asp-action="Main"
+                                                   asp-route-MenuName="@subitem.Name.Replace(" ", "")"
+                                                   asp-route-SubMenuName=""
+                                                   class="footer-link">@subitem.Name</a>
+                                            }
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                        </li>
+                    }
+                </ul>
+            }
+            <script>
+                document.querySelectorAll(".footer-link-has-sub-menu > a").forEach(el => {
+                    el.addEventListener("click", event => {
+                        event.preventDefault();
+                        window.x = event;
+                        const path = event.path || (event.composedPath && event.composedPath());
+                        const target = path.filter(x => x.tagName == 'A')[0];
+                        const ul = target.parentElement.querySelector("ul");
+
+
+                        if (getComputedStyle(ul).display == 'none') {
+                            ul.style.display = 'block'
+                        }
+                        else {
+                            ul.style.display = 'none'
+                        }
+                    })
+                })
+            </script>
+            @Html.Raw(SettingsManager.GetValue("FooterHtml"))
+        </div>
+    </footer>
+}

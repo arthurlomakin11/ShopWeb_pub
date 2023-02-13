@@ -1,0 +1,43 @@
+﻿@{
+    List<Category> CategoryList = ViewData["Categories"] as List<Category>;
+    CategoryList = CategoryList
+                    .Where(c => c.Parent == null)
+                    .Where(c => c.Active == true)
+                    .OrderByDescending(c => c.Rating)
+                    .ToList();
+    string CurrentCategory = ViewData["Category"] as string;
+
+    ViewData["Title"] = "Продукція";
+
+    string ImagesFolderLocalPath = SettingsManager.GetValue("ImagesFolderLocalPath");
+}
+
+<link rel="stylesheet" href="css/products.css">
+
+@if (CategoryList != null)
+{
+    <section class="cards categories_cards">
+        @foreach (Category Category in CategoryList)
+        {
+            <div class="card" style="width: 18rem;">
+                <div class="card-body">
+                    <h5 class="card-title">
+                        @if (Category.ShowText)
+                        {
+                            @Category.Name
+                        }
+                        @if (Category.Images.Count > 0)
+                        {
+                            <img class="category_card_img" alt="@Category.Name" src="@ImagesFolderLocalPath/@Category.Images.First().Url" />
+                        }
+                    </h5>
+                    <a asp-controller="Products"
+                       asp-action="List"
+                       asp-route-subcategory=""
+                       asp-route-category="@UrlExtensions.RemoveUnacceptableSymbols(Category.Name)"
+                       class="btn btn-outline-primary m-1">Перейти до категорії</a>
+                </div>
+            </div>
+        }
+    </section>
+}

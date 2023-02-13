@@ -1,0 +1,59 @@
+﻿@{
+    ViewBag.Title = "Мережа";
+}
+
+<style>
+    .card img {
+        object-fit: cover;
+        height: 180px;
+        width: 100%;
+    }
+
+    .shops {
+        display: grid;
+        grid-template-columns: repeat(4, 18rem);
+        grid-gap: 10px;
+    }
+</style>
+
+<div class="shops cards mt-5">
+    @foreach (Shop shop in ViewBag.Shops)
+    {
+        <div class="card">
+            <img class="card-img-top" src="@shop.ImageUri" alt="@shop.Name" />
+            <div class="card-body">
+                <h5 class="card-title">@shop.Adress</h5>
+                @if (!string.IsNullOrWhiteSpace(shop.PhoneNumber))
+                {
+                    string[] numbers = shop.PhoneNumber.Split(", ");
+
+                    @foreach(string number in numbers)
+                    {
+                         <p class="card-text">
+                            <a href="tel:@number">
+                                <i class="fas fa-phone-alt"></i>
+                                @number
+                            </a>
+                        </p>
+                    } 
+                }
+                @if (!string.IsNullOrWhiteSpace(shop.WorkTime))
+                {
+                    <p class="card-text">@shop.WorkTime</p>
+                }
+                <p class="card-text">
+                    <a href="@shop.MapsUri" target="_blank">
+                        <i class="fas fa-map-marked-alt"></i>
+                        Ми на карті
+                    </a>
+                </p>
+                <p class="card-text">
+                    <a href="@shop.MapsDirectionsUri" target="_blank">
+                        <i class="fas fa-route"></i>
+                        Прокласти шлях
+                    </a>
+                </p>
+            </div>
+        </div>
+    }
+</div>

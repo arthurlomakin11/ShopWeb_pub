@@ -1,0 +1,42 @@
+﻿@inject SignInManager<User> SignInManager
+@inject UserManager<User> UserManager
+
+@{ 
+    string Greeting = DateTime.Now.Hour switch
+    {
+        <= 12 => "Доброго ранку",
+        > 12 and <= 17 => "Доброго дня",
+        _ => "Доброго вечора"
+    };
+}
+
+<ul class="navbar-nav">
+    @if (SignInManager.IsSignedIn(User))
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">
+            @Greeting, @UserManager.GetUserAsync(User).Result.Fio!
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">Корзина</a>
+        </li>
+        <li class="nav-item">
+            <form class="form-inline" asp-area="Identity" asp-page="/Account/Logout" asp-route-returnUrl="@Url.Action("Index", "Home", new { area = "" })">
+                <button  type="submit" class="nav-link btn btn-link text-dark">Вийти</button>
+            </form>
+        </li>
+    }
+    else
+    {
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Cart" asp-action="Index">Корзина</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Register">Реєстрація</a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link text-dark" asp-area="Identity" asp-page="/Account/Login">Вхід</a>
+        </li>
+    }
+</ul>

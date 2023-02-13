@@ -1,0 +1,91 @@
+﻿<link href="css/about.css" rel="stylesheet"/>
+
+<div class="about_main mt-5">
+    <div class="about_block">
+        <h2>Про нас</h2>
+        <p>
+            Магазин «Family Craft» – це завжди найкраще м’ясо та натуральні продукти, які задовольнять смак найвимогливішого гурмана!<br />
+            Наш асортимент приємно вразить навіть найвибагливіших споживачів, і кожен зможе обрати для себе те, що йому потрібно!
+        </p>
+        <div class="date_counters">
+            <div class="date-counter">
+                <span id="years_counter" class="red_big_span">10</span>
+                <span id="years_text">&nbspроків</span>
+            </div>
+            <div class="date-counter">
+                <span id="months_counter" class="red_big_span">10</span>
+                <span id="months_text">&nbspмісяців</span>
+            </div>
+            <div class="date-counter">
+                <span id="days_counter" class="red_big_span">10</span>
+                <span id="days_text">&nbspднів</span>
+            </div>
+            <div class="date-counter">
+                <span id="hours_counter" class="red_big_span">10</span>
+                <span id="hours_text">&nbspгодин</span>
+            </div>
+            <span class="date_counters_end_text">
+                &nbspна ринку
+            </span>
+        </div>
+        <div class="counters">
+            <div>
+                <span class="red_big_span"></span>
+                <div>задоволених клієнтів</div>
+            </div>
+            <div>
+                <span class="red_big_span">0</span>
+                <div>фірмових магазини</div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/about_counter.js"></script>
+<script>
+    function count(){
+        let num_2 = @SettingsManager.GetValue("ClientsCount");
+        let num_3 = 4
+
+        let num_2_loop = @SettingsManager.GetValue("ClientsCount") - 200
+        let num_3_loop = 0
+
+        let num_2_step = 10
+        let num_3_step = 100
+
+        let timeout2 = setInterval(() => {
+            if(num_2_loop <= num_2){
+                document.querySelectorAll(".counters .red_big_span")[0].innerHTML = num_2_loop
+                num_2_loop++
+            }
+            else {
+                clearInterval(timeout2)
+            }
+        }, num_2_step)
+
+        let timeout3 = setInterval(() => {
+            if(num_3_loop <= num_3){
+                document.querySelectorAll(".counters .red_big_span")[1].innerHTML = num_3_loop
+                num_3_loop++
+            }
+            else {
+                clearInterval(timeout3)
+            }
+        }, num_3_step)
+    }
+    count()
+</script>
+
+<div>
+    <h2>НАШІ ОСНОВНІ ПЕРЕВАГИ</h2>
+    <ul style="font-size: 20px">
+        <li>Ми ретельно контролюємо кожен з етапів - від забою худоби до реалізації готової продукції.</li>
+        <li>Постійно інвестуємо кошти в сучасне високотехнологічне обладнання за європейськими зразками.</li>
+        <li>Використання натуральної сировини - запорука гарантовано стабільної якості продукції.</li>
+        <li>Ми не використовуємо домішок, штучних підсилювачів смаку, прискорювачів дозрівання ковбас і продуктів з ГМО.</li>
+        <li>Широкий асортимент усіх видів ковбасних виробів, різних м'ясних делікатесів і натуральних напівфабрикатів.</li>
+        <li>Оригінальні рецептури для виготовлення всіх видів напівфабрикатів власного виробництва, таких як: домашні ковбаси, бургери, люля кебаб, млинці, вареники, хінкалі та багато іншого.</li>        
+        <li>У магазині також представлена ексклюзивна продукція.</li>
+        <li>Великий штат співробітників щодня піклуються про те, щоб ви споживали кращі м'ясні та ковбасні вироби.</li>
+    </ul>
+</div>

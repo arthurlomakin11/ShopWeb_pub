@@ -1,0 +1,78 @@
+﻿@model Cart
+
+@{ 
+    ViewBag.Title = "Замовлення № " + Model.Id.ToString();
+}
+
+<link rel="stylesheet" href="css/cart.css" />
+
+<div class="mt-3">Номер замовлення: @Model.Id</div>
+<div class="mt-1 mb-1">Дата замовлення: @Model.CartStatus.CreationDateTime.ToString("dd.MM.yyyy")</div>
+
+<table class="order_table">
+    <thead>
+        <tr>
+            <th>Назва продукту</th>
+            <th>Кількість</th>
+            <th>Ціна</th>
+            <th>Сума</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (CartItem Item in Model.CartItems)
+        {
+            <tr class="order_item">
+                <td>@Item.Product.Name</td>
+                <td>@Item.Quantity.ToString("G29")</td>
+                <td>
+                    @if(@Item.DollarsPrice > 0)
+                    {
+                        @(Item.DollarsPrice.ToString("G29") + "$")
+                    }
+                    else
+                    {
+                        @(Item.Price.ToString("G29") + " грн")
+                    }
+                </td>
+                <td>
+                    @if(@Item.DollarsFinalSum > 0)
+                    {
+                        @(Item.DollarsFinalSum.ToString("G29") + "$")
+                    }
+                    else
+                    {
+                        @(Item.FinalSum.ToString("G29") + " грн")
+                    }
+                </td>
+            </tr>
+        }
+        @if(Model.DeliveryPrice > 0)
+        {
+            <tr>
+                <td>Доставка:</td>
+                <td></td>
+                <td></td>
+                <td>@Model.DeliveryPrice.ToString("G29")</td>
+            </tr>   
+        }
+        @if(Model.FinalSum > 0)
+        {
+            <tr>
+                <td>Всього:</td>
+                <td></td>
+                <td></td>
+                <td>@(Model.FinalSumWithDelivery.ToString("G29") + " грн")</td>
+            </tr>
+        }
+        @if(Model.DollarsFinalSum > 0)
+        {
+            <tr>
+                <td>Всього:</td>
+                <td></td>
+                <td></td>
+                <td>@(Model.DollarsFinalSum.ToString("G29") + "$")</td>
+            </tr>
+        }
+        <component type="typeof(OrderComponent)" param-Order="@Model" render-mode="Server"/>
+    </tbody>
+</table>

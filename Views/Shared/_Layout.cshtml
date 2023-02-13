@@ -1,0 +1,92 @@
+﻿@inject ILocalStorageService LocalStorage
+@using System.IO
+@using System.Diagnostics
+
+@{
+    ShopWebContext context = new ShopWebContext();
+ 
+    List<MenuItem> menu = (from element in context.Menu
+                            orderby element.SequentialNumber
+                            where element.Type == MenuType.MenuItem
+                            where element.Active == true
+                            where element.ShowInMenu == true
+                            where element.Parent == null
+                            select element)
+                            .Include(item => item.Images)
+                            .ToList();
+ 
+    string IconUri = SettingsManager.GetValue("IconUri");
+  
+    string SiteName = SettingsManager.GetValue("SiteName");
+   
+    string ClientsCountLastIncremented = SettingsManager.GetValue("ClientsCountLastIncremented");
+    
+    if (string.IsNullOrWhiteSpace(ClientsCountLastIncremented))
+    {
+        ClientsCountLastIncremented = "0";
+    }
+  
+   
+    if (long.Parse(ClientsCountLastIncremented) != DateTime.Now.Date.Ticks)
+    {
+        context.Settings.FirstOrDefault(s => s.Key == "ClientsCountLastIncremented").Value = DateTime.Now.Date.Ticks.ToString();
+        context.Settings.FirstOrDefault(s => s.Key == "ClientsCount").Value = (int.Parse(context.Settings.FirstOrDefault(s => s.Key == "ClientsCount").Value) + 93).ToString();
+        context.SaveChanges();
+    }
+  
+   
+    string BodyStartHtml = SettingsManager.GetValue("BodyStartHtml");
+    string BodyEndHtml = SettingsManager.GetValue("BodyEndHtml");
+   
+    string HeadStartHtml = SettingsManager.GetValue("HeadStartHtml");
+    
+    bool ProductsMenuInSeparatePage = SettingsManager.GetValueBool("ProductsMenuInSeparatePage");
+
+    string IconType = SettingsManager.GetValue("IconType");
+ 
+    string Error = "";
+ 
+    ViewData["MenuItem"] = StatisticsManager.MenuItem;
+    ViewData["MenuItemName"] = StatisticsManager.MenuItemName;
+    StatisticsManager.WriteStatistics(Context);
+    
+
+}
+
+
+<!DOCTYPE html>
+<html lang="uk" translate="no">
+<head>
+    @Error
+    @Html.Raw(HeadStartHtml)
+    <title>@ViewData["Title"] - @SiteName</title>
+    <base href="~/" />
+    <partial name="Meta" />    
+
+    <link rel="icon" type="@IconType" src="@IconUri">
+    <link rel="shortcut icon" type="@IconType" href="@IconUri" />
+
+    <partial name="Scripts" />
+    <partial name="Styles" />
+</head>
+<body>
+    @Html.Raw(BodyStartHtml)
+    <header>        
+        <partial name="Menu" model="menu" />
+        @if (!ProductsMenuInSeparatePage)
+        {
+            <partial name="CategoryList" view-data="@ViewData" />
+        }
+    </header>
+
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()            
+        </main>
+    </div>
+    <partial name="Footer"/>
+    @await RenderSectionAsync("Scripts", required: false)
+    <script src="_framework/blazor.server.js"></script>
+    @Html.Raw(BodyEndHtml)
+</body>
+</html>

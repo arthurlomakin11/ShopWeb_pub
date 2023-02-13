@@ -1,0 +1,8 @@
+﻿@using System.Web;
+
+@model MenuItem
+@{ 
+    ViewData["Title"] = Model.Name;
+}
+
+@Html.Raw(HttpUtility.HtmlDecode(Model.Content))

@@ -1,0 +1,64 @@
+﻿@{ 
+    ViewBag.Title = "Контакти";
+
+    string FeedbackString = "Зворотний звязок";
+}
+
+<div style="display: flex;flex-wrap: wrap-reverse;">
+    <div style="width: 50%;">
+        <component type="typeof(Feedback)" render-mode="ServerPrerendered" param-FeedbackHeader="FeedbackString"/>
+    </div>
+    <style>
+        i {
+            font-size: 80px;
+            display: block !important;
+            color: #ff4141;
+        }
+        .grid_cont div {
+            text-align: center;
+        }
+
+        .new_line {
+            display: block;
+        }
+
+        .grid_cont {
+            display: grid;
+            grid-template-columns: repeat(2, 50%);
+            grid-gap: 10px;
+        }
+    </style>
+    <div style="width: 50%; padding: 0 15px;">
+        <h2>Надіслати повідомлення</h2>
+        <h5>Поділіться своїми ідеями чи побажаннями по роботі нашого магазину. Чи залишилися ви задоволені замовленням або є якісь зауваження. Ми будемо раді отримати від вас пару рядків.</h5>
+        <div class="grid_cont">
+            <!--
+            <div>
+                <i class="fas fa-mobile-alt"></i>
+                <span style="font-size: .78571rem !important;">Київська область</span>
+                <a class="new_line" href="tel:+380971089690">
+                    <span style="font-size: .78571rem !important; color:red;">+38 (097) 108 96 90</span>
+                </a>
+            </div>
+            <div>
+                <i class="fas fa-mobile-alt"></i>
+                <span style="font-size: .78571rem !important;">Житомирська область</span>
+                <a class="new_line" href="tel:+380971089690">
+                    <span style="font-size: .78571rem !important; color:red;">+38 (097) 108 96 90</span>
+                </a>
+            </div>-->
+            <div>
+                <i class="far fa-clock"></i>
+                <span style="font-size: .78571rem !important;">ГОДИНИ РОБОТИ</span>
+                <span class="new_line" style="font-size: .78571rem !important; color:red;">Пн-Нд: 8.00 - 22.00</span>
+            </div>
+            <div>
+                <i class="far fa-envelope"></i>
+                <span style="font-size: .78571rem !important;">Email</span>
+                <a class="new_line" href="mailto:myasnoff.ua@gmail.com">
+                    <span style="font-size: .78571rem !important; color:red;">myasnoff.ua@gmail.com</span>
+                </a>
+            </div>
+        </div>
+    </div>
+</div>

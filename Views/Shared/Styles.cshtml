@@ -1,0 +1,13 @@
+﻿<link rel="stylesheet" href="~/fontawesome/css/all.css">
+<link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+<link rel="stylesheet" href="~/css/site.css" />
+<link rel="stylesheet" href="~/css/site_2.css" />
+<link rel="stylesheet" href="~/css/site_dark.css" />
+<link rel="stylesheet" href="css/style.css" />
+
+@{
+    string Style = SettingsManager.GetValue("Style");
+}
+<style>
+    @Html.Raw(Style)
+</style>

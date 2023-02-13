@@ -1,0 +1,31 @@
+﻿@model List<Cart>
+
+
+@{
+    ViewBag.Title = "Мої замовлення";
+}
+
+<h2>@ViewBag.Title</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Дата замовлення</th>
+            <th>Сума замовлення</th>
+            <th></th>
+        </tr>
+    </thead>
+    @foreach (Cart Cart in Model)
+    {
+        <tr>
+            <td>@Cart.CartStatus.CreationDateTime.ToString("dd.MM.yyyy")</td>
+            <td>
+                @Cart.FinalSumWithDelivery.ToString("G29")
+            </td>
+            <td>
+                <a asp-action="Details" asp-route-cartId="@Cart.Id">
+                    Детальніше
+                </a>
+            </td>
+        </tr>
+    }
+</table>

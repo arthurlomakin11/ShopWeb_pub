@@ -1,0 +1,131 @@
+﻿@inject SignInManager<User> SignInManager
+@inject ShopWebContext Context
+@inject NavigationManager NavManager
+@inject ILocalStorageService LocalStorage
+@inject IJSRuntime JavaScript
+
+<link rel="stylesheet" href="css/cart.css" />
+@if (CurrentCart != null)
+{
+    @if (CurrentCart.CartItems.Count > 0)
+    {
+        @if (!ShowCheckout || HideCartOnCheckout == 0)
+        {
+            <table class="cart_table">
+                <thead>
+                    <tr>
+                        <th>Назва</th>
+                        <th>Кількість</th>
+                        <th>Ціна</th>
+                        <th>Сума</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (User != null)
+                    {
+                        @foreach (CartItem Item in CurrentCart.CartItems)
+                        {
+                            <CartItemComponent CartItem="@Item" Context="@Context" DeleteEvent="Delete" RefreshEvent="Refresh" @key="@Item.Id" />
+                        }
+                    }
+                    else
+                    {
+                        @foreach (CartItem Item in CurrentCart.CartItems)
+                        {
+                            <CartItemComponent CartItem="@Item" Context="@Context" DeleteEvent="Delete" RefreshEvent="Refresh" />
+                        }
+                    }
+
+                    @if(CurrentCart.Sum > 0)
+                    {
+                        <tr class="cart_item">
+                            <td>Всього:</td>
+                            <td></td>
+                            <td></td>
+                            <td>@CurrentCart.Sum.ToString("G29") грн</td>
+                        </tr>
+                    }
+                    @if(CurrentCart.DollarsSum > 0)
+                    {
+                        <tr class="cart_item">
+                        <td>Всього:</td>
+                        <td></td>
+                        <td></td>
+                        <td>@CurrentCart.DollarsSum.ToString("G29")$</td>
+                    </tr>
+                    }                                    
+                </tbody>
+            </table>
+            @if(ShowAgreementCheckboxInCart == 1)
+            {
+                <div class="form-check agreement-block">
+                    <input id="agreement_checkbox" type="checkbox" class="form-check-input agreement_checkbox" @bind-value="Agreed">
+                    <label class="form-check-label agreement_checkbox-label" for="agreement_checkbox">@((MarkupString)AgreementTextInCart)</label>
+                </div>   
+            }
+        }
+        else
+        {
+            <Checkout Closed="HideCheckout" />
+        }
+        @if (CurrentCart.Sum >= MinOrderSum)
+        {
+            @if (Agreed)
+            {
+                @if (!ShowCheckout)
+                {
+                    @*
+                    @if (User != null)
+                    {
+                        <button @onclick="@(() => ShowCheckout = true)" class="btn btn-info">Оформити замовлення</button>
+                    }
+                    else
+                    {
+                        <div>Щоб зробити замовлення потрібно зареєструватися або увійти.</div>
+                    }
+                    *@
+                    <button @onclick="@(() => ShowCheckout = true)" class="btn btn-info">Оформити замовлення</button>
+                }
+                else if (HideCartOnCheckout == 0)
+                {
+                    <Checkout Closed="HideCheckout" />
+                }
+            }           
+        }
+        else
+        {
+            <div class="mt-2">Мінімальна сума замовлення: <b>@MinOrderSum грн</b></div>
+        }
+    }
+    else
+    {
+        <div>Корзина порожня</div>
+    }
+
+    @if(int.Parse(SettingsManager.GetValue("ShowProductsCollectionsInCart")) == 1)
+    {        
+        List<ProductCollection> ProductCollections = Context.ProductCollections
+                                                            .Where(p => p.Active == true)
+                                                            .Where(p => p.ShowInCart == true)
+                                                            .Include(p => p.Products)
+                                                                .ThenInclude(p => p.Product)
+                                                                    .ThenInclude(product => product.Images)
+                                                            .AsSingleQuery()
+                                                            .ToList();
+        @foreach (ProductCollection ProductCollection in ProductCollections)
+        {
+            <div class="cart_product_collection_name">@ProductCollection.Name</div>
+            <div class="cards">
+                @foreach (ProductInCollection ProductInCollection in ProductCollection.Products)
+                {
+                    Product Product = ProductInCollection.Product;
+                    <ProductComponent Changed="Changed" CurrentProduct="@Product" /> 
+                }                
+            </div>
+        }
+    }
+}
+else if (Rendered == true)
+{
+    AddNewCart();
+}

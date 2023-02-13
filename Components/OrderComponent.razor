@@ -1,0 +1,18 @@
+﻿@if (Done)
+{
+	<button class="order__copy-items btn btn-success">
+		Cкопіювано
+	</button>
+}
+else if (Loading)
+{
+	<button class="order__copy-items btn btn-info">
+		Копіювання <div class="order__copy-items__loader"></div>
+	</button>
+}
+else
+{
+	<button class="order__copy-items btn btn-outline-primary" @onclick="CopyElementsToCart">
+		Копіювати продукти до корзини
+	</button>
+}

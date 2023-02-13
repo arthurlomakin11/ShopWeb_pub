@@ -1,0 +1,4 @@
+﻿html, body {
+    min-height: max-content;
+    min-height: -webkit-fill-available;
+}

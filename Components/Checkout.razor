@@ -1,0 +1,175 @@
+﻿@inject SignInManager<User> SignInManager
+@inject NavigationManager NavManager
+@inject ILocalStorageService LocalStorage
+
+@if (Loaded)
+{
+    <div class="checkout @((ClosedBool ? "closed_animation" : "opened_animation"))">
+        <div style="padding: 30px">
+            @if (!Done)
+            {
+                <h3>Оформлення замовлення</h3>
+                <div class="mt-3">                
+                    <EditForm autocomplete="off" Model="@checkoutModel" OnValidSubmit="@HandleValidSubmit" OnInvalidSubmit="@HandleInvalidSubmit">
+                        @if (User == null)
+                        {
+                            <div class="col-lg-5">
+                                <label for="fullname">ПІБ: </label>
+                                <InputText id="fullname" @bind-Value="checkoutModel.FullName" class="form-control" />
+                            </div>
+                            <div class="col-lg-5">
+                                <label for="phone">Номер телефону: </label>
+                                <InputText id="phone" @bind-Value="checkoutModel.PhoneNumber" class="form-control" />
+                            </div>
+                        }
+                        @if(OnlyOneShopDelivery == 0)
+                        {
+                            @if(PickupEnabledInCheckout == 1)
+                            {
+                                <div class="col-lg-5 mt-3">
+                                    <label for="DeliveryType">Тип замовлення: </label>
+                                    <select name="DeliveryType" @bind="checkoutModel.DeliveryType" class="form-control">
+                                        <option value="@DeliveryType.Delivery">Доставка</option>
+                                        <option value="@DeliveryType.Pickup">Самовивіз</option>
+                                    </select>
+                                </div>
+                            }
+                            @if (checkoutModel.DeliveryType == DeliveryType.Delivery)
+                            {
+                                <DataAnnotationsValidator />
+                                <ValidationSummary />
+                                DeliveryPriceTag SuitableDeliveryPriceTag = GetSuitableDeliveryPriceTag();
+                                @if(SuitableDeliveryPriceTag != null)
+                                {
+                                    @if(SuitableDeliveryPriceTag.Price != 0)
+                                    {
+                                        <div class="delivery_price_checkout_text">@DeliveryPriceCheckoutPattern.Replace("{FinalSum}", (CurrentCart.Sum + SuitableDeliveryPriceTag.Price).ToString("G29")).Replace("{DeliveryPrice}", SuitableDeliveryPriceTag.Price.ToString())</div>   
+                                    }                            
+                                }
+                                else
+                                {
+                                    <div>Помилка в обробці цін доставки</div>
+                                }
+
+                                @if (SelectLocalityInCheckout == 1)
+                                {
+                                    <div class="col-lg-5 mt-3">
+                                        <label for="location">Населений пункт: </label>
+                                        @if(FilterAdresses.Count() != 1)
+                                        {
+                                            <select name="location" value="@checkoutModel.ShopFilterAdressId" @onchange="ChangeFilterAdress" class="form-control">
+                                                @{
+                                                    int AdressesCount = 0;
+                                                }
+                                                @foreach (Adress adress in FilterAdresses)
+                                                {
+                                                    @if (AdressesCount == 0)
+                                                    {
+                                                        <option value="@adress?.Id" selected>@adress?.Name</option>
+                                                    }
+                                                    else
+                                                    {
+                                                        <option value="@adress?.Id">@adress?.Name</option>
+                                                    }
+
+                                                    {
+                                                        AdressesCount++;                                            
+                                                    }                                        
+                                                }                                        
+                                            </select>
+                                        }
+                                        else
+                                        {
+                                            {
+                                                Adress SingleAdress = FilterAdresses.First();
+                                                checkoutModel.ShopFilterAdressId = SingleAdress.Id;
+                                            }
+                                            <select name="location" value="@checkoutModel.ShopFilterAdressId" @onchange="ChangeFilterAdress" class="form-control">                                        
+                                                <option value="@FilterAdresses.First().Id">@FilterAdresses.First().Name</option>
+                                            </select>
+                                        }
+                                    </div>
+                                    IEnumerable<Adress> FilteredAdresses = Adresses.Where(a => a.Parent != null && a.Parent.Id == checkoutModel.ShopFilterAdressId);
+
+                                    <div class="col-lg-5 mt-3">
+                                        @if (FilteredAdresses.Count() > 0 && SelectAdressInCheckout == 1)
+                                        {
+                                            <label for="street">Вулиця: </label>
+                                            <input class="form-control" value="@Adresses.FirstOrDefault(a => a.Id == checkoutModel.ShopAdressId)?.FullName" @onchange="ChangeAdressName" list="street_selector" id="street" name="street" />
+
+                                            <datalist id="street_selector">
+                                                @foreach (Adress adress in FilteredAdresses)
+                                                {
+                                                    <option value="@adress?.FullName" @key="@adress.Id"></option>
+                                                }
+                                            </datalist>
+                                        }
+                                        else
+                                        {
+                                            checkoutModel.ShopAdressId = checkoutModel.ShopFilterAdressId;
+                                        }
+                                    </div>
+                                }
+
+                                <div class="col-lg-5">
+                                    <label for="name">Адреса: </label>
+                                    <InputText id="name" @bind-Value="checkoutModel.Adress" class="form-control" />
+                                </div>                        
+                            }
+                            else
+                            {
+                                <div class="col-lg-5 mt-3">
+                                    <label for="shop">Магазин: </label>
+                                    <select name="shop" value="@checkoutModel.ShopId" @onchange="ChangeShopId" class="form-control">
+                                        @foreach(Shop Shop in Shops)
+                                        {
+                                            if (!checkoutModel.ShopId.HasValue)
+                                            {
+                                                checkoutModel.ShopId = Shop.Id;
+                                            }
+                                            <option value="@Shop.Id">@Shop.Adress</option>
+                                        }
+                                    </select>
+                                </div>
+
+                                <div class="col-lg-5 mt-3">
+                                    <label for="time">Час: </label>
+                                    <select name="time" value="@checkoutModel.DeliveryTimeId" @onchange="ChangeDeliveryTime" class="form-control">
+                                        @foreach (DeliveryTime time in DeliveryTimes)
+                                        {
+                                            if (!checkoutModel.DeliveryTimeId.HasValue)
+                                            {
+                                                checkoutModel.DeliveryTimeId = time.Id;
+                                            }
+                                            <option value="@time?.Id">@time?.Name</option>
+                                        }
+                                    </select>
+                                </div>
+                            }
+                        }                        
+
+
+                        <div class="col-lg-5">
+                            <label for="name">Коментар: </label>
+                            <InputTextArea id="comment" @bind-Value="checkoutModel.Comment" class="form-control" />
+                        </div>
+
+                        <button type="submit" class="btn btn-info ml-3 mt-3">Замовити</button>
+                    </EditForm>
+                    @text
+                </div>
+            }
+            else if (ShowWheelInCheckout == 1)
+            {
+                <Wheel Cart="CurrentCart" User="User"/>
+            }
+        </div>
+        @if (!Done)
+        {
+            <div class="close_button" @onclick="Close">
+                <div class="close_line"></div>
+                <div class="close_line" style="transform: rotate(90deg) translateX(-3px);"></div>
+            </div>
+        }
+    </div>
+}

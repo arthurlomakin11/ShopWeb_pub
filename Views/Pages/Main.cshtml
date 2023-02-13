@@ -1,0 +1,38 @@
+﻿@{
+    ViewBag.Title = "Головна";
+
+    ShopWebContext Context = new ShopWebContext();
+    IQueryable<MenuItem> Sliders = from slider in Context.Menu
+                                   where slider.Type == MenuType.SliderItem
+                                   where slider.Parent == null
+                                   select slider;
+}
+
+<script>
+    @Html.Raw(SettingsManager.GetValue("MainPageScript"))
+</script>
+
+@foreach (MenuItem slider in Sliders)
+{
+    <component type="typeof(Slider)" render-mode="Server" param-SliderParent="slider" />
+}
+
+<component type="typeof(MainPageProductsCollectionsList)" render-mode="Server"/>
+
+@Html.Raw(SettingsManager.GetValue("MainPageHTML"))
+
+@if (int.Parse(SettingsManager.GetValue("ShowAboutUsF")) == 1)
+{
+    <partial name="/Views/Pages/AboutUsMainF.cshtml" />
+}
+
+@if (int.Parse(SettingsManager.GetValue("ContactsF")) == 1)
+{
+    <div style="margin-top: 30px">
+        <partial name="/Views/Pages/ContactsF.cshtml" />
+    </div>
+}
+
+<script>
+    @Html.Raw(SettingsManager.GetValue("MainPageScriptEnd"))
+</script>

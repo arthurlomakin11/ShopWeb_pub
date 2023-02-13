@@ -1,0 +1,13 @@
+﻿@{
+    ViewBag.Title = "Помилка";
+}
+<div style="text-align:center">
+    @if (ViewBag.StatusCode == 404)
+    {
+        <div>Сторінку не знайдено!</div>
+    }
+    else
+    {
+        <div>Помилка: Код @ViewBag.StatusCode</div>
+    }
+</div>

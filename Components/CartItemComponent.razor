@@ -1,0 +1,44 @@
+﻿<tr>
+    <td>@CartItem.Product.Name 
+        @if (ShowDescriptionInCart == 1)
+        {
+            <span>@CartItem.Product.Description</span>
+        }
+    </td>
+    <td>
+        <div class="form-row ml-2">
+            <div class="col-auto cart_item_decrease">
+                <button class="btn btn-outline-danger font-weight-bold" @onclick="Decrease">-</button>
+            </div>
+            <div class="col-auto">
+                <input class="input-group form-control text-center" style="width: 70px" @bind="Quantity">
+            </div>
+            <div class="col-auto cart_item_increase">
+                <button class="btn btn-outline-success font-weight-bold" @onclick="Increase">+</button>
+            </div>
+        </div>
+    </td>
+    <td>
+        @if (CartItem.Product.DollarsPrice > 0)
+        {
+            @(CartItem.Product.DollarsPrice.ToString("G29") + "$")
+        }
+        else
+        {
+            @(CartItem.Product.Price.ToString("G29") + " грн")
+        }
+    </td>
+    <td>
+        @if(CartItem.DollarsSum > 0)
+        {
+            @(CartItem.DollarsSum.ToString("G29") + "$")
+        }
+        else
+        {
+            @(CartItem.Sum.ToString("G29") + " грн")
+        }
+    </td>
+    <td>
+        <button class="btn btn-danger ml-1" @onclick="Delete">Видалити</button>
+    </td>
+</tr>

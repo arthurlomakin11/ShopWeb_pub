@@ -1,0 +1,16 @@
+﻿@{
+    ViewBag.Title = "Корзина";       
+}
+
+@Html.Raw(SettingsManager.GetValue("CartStartHtml"))
+
+@if (int.Parse(SettingsManager.GetValue("ShowOrderLinkInCart")) == 1)
+{
+    <div class="orders_link_in_cart" style="display: flex;justify-content: flex-end;">
+        <a class="btn btn-primary align-self-end" href="./Orders" style="width: 200px;margin-top: 10px;display: block;">Мої замовлення</a>
+    </div>   
+}
+
+@Html.Raw(SettingsManager.GetValue("OrderPageHtml"))
+
+<component type="typeof(CartComponent)" render-mode="Server"/>

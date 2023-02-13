@@ -1,0 +1,93 @@
+﻿@model List<MenuItem>
+
+@{
+    ShopWebContext context = new ShopWebContext();
+
+    bool ShowMainPageLink = SettingsManager.GetValueBool("ShowMainPageLink");
+
+    bool RedirectUriBool = string.IsNullOrWhiteSpace(SettingsManager.GetValue("RedirectUri"));
+    string RedirectUriMain = RedirectUriBool ? "Головна" : "";
+
+    string MenuStyle = SettingsManager.GetValue("MenuStyle");
+
+
+    string LogoPath = SettingsManager.GetValue("LogoPath");
+    string LogoWidth = SettingsManager.GetValue("LogoWidth");
+    string LogoHeight = SettingsManager.GetValue("LogoHeight");
+
+    string MenuHtmlAfterCollapseButton = SettingsManager.GetValue("MenuHtmlAfterCollapseButton");
+
+
+    bool CanUserBuyProducts = SettingsManager.GetValueBool("CanUserBuyProducts");
+
+    bool HasMultipleLanguages = SettingsManager.GetValueBool("HasMultipleLanguages");
+}
+
+
+<nav style="@MenuStyle" class="navbar navbar-expand-md navbar-toggleable-sm bg-white border-bottom box-shadow main-nav">
+    <a class="navbar-brand" asp-area="" asp-controller="Main" asp-action="Main"
+        asp-route-MenuName="@RedirectUriMain">
+        <img class="inverted" style="width: @LogoWidth; height: @LogoHeight" src="@LogoPath" />
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+            aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    @Html.Raw(MenuHtmlAfterCollapseButton)
+    <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
+        <ul class="navbar-nav flex-grow-1">
+            @if (ShowMainPageLink)
+            {
+                <li class="nav-item">
+                    <a asp-area="" asp-controller="Main" asp-action="Main"
+                        asp-route-MenuName="Головна"
+                        class="nav-link text-dark">Головна</a>
+                </li>
+            }
+            <li class="nav-item">
+                <a asp-controller="Products" asp-action="List"
+                    asp-route-category=""
+                    asp-route-subcategory=""
+                    class="nav-link text-dark">Продукція</a>
+            </li>
+            @foreach (MenuItem element in Model)
+            {
+                <li class='nav-item @(element.ShowDropDown ? "dropdown" : "")'>
+                    @if (element.ShowDropDown)
+                    {
+                        <a asp-controller="Main" asp-action="Main"
+                            asp-route-MenuName="@element.Name.Replace(" ", "")"
+                            asp-route-SubMenuName=""
+                            class="nav-link dropdown-toggle"
+                            id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">@element.Name</a>
+                        <div class="dropdown-menu" aria-labelledby="navbarDropdown">
+                            @foreach (MenuItem SubItem in context.Menu.Where(menu => menu.Parent == element).Where(item => item.Active == true))
+                            {
+                                <a class="dropdown-item"
+                                    asp-controller="Main"
+                                    asp-action="Main"
+                                    asp-route-MenuName="@element.Name.Replace(" ", "").Replace("'", "")"
+                                    asp-route-SubMenuName="@SubItem.Name.Replace(" ", "").Replace("'", "")">@SubItem.Name</a>
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <a asp-controller="Main" asp-action="Main"
+                            asp-route-MenuName="@element.Name.Replace(" ", "").Replace("'", "")"
+                            asp-route-SubMenuName=""
+                            class="nav-link text-dark">@element.Name</a>
+                    }
+                </li>
+            }
+        </ul>
+        @if(CanUserBuyProducts)
+        {
+            <partial name="_LoginPartial" />   
+        }
+        @*@if (HasMultipleLanguages)
+        {
+            <partial name="_SelectLanguagePartial" />
+        }*@
+    </div>
+</nav>
